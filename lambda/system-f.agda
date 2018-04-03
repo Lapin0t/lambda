@@ -1,8 +1,8 @@
-module lambda.system-f-curry where
+module lambda.system-f where
 
 open import Data.Nat
 open import Data.Fin hiding (lift)
-open import Data.Vec
+open import lambda.vec
 open import lambda.untyped
 
 infixr 22 _⇒_
@@ -17,7 +17,7 @@ type₀ : Set
 type₀ = type 0
 
 context : ℕ → ℕ → Set
-context n = Vec (type n)
+context n = vec (type n)
 
 lift : ∀ {n} → type n → type (suc n)
 lift (var i) = var (suc i)
@@ -52,18 +52,18 @@ subst₁ : ∀ {n} → type (suc n) → type n → type n
 subst₁ x y = subst x (1ˢ y)
 
 lift-c : ∀ {n m} → context n m → context (suc n) m
-lift-c [] = []
-lift-c (x ∷ xs) = lift x ∷ lift-c xs
+lift-c ε = ε
+lift-c (Γ ▸ x) = lift-c Γ ▸ lift x
 
 
 infix 10 _⊢_∶_
 
 data _⊢_∶_ {n m : ℕ} (Γ : context n m) : term m → type n → Set where
   ax : ∀ {i} → Γ ⊢ var i ∶ lookup i Γ
-  lam : ∀ {A B x} → (A ∷ Γ) ⊢ x ∶ B → Γ ⊢ lam x ∶ A ⇒ B
+  lam : ∀ {A B x} → Γ ▸ A ⊢ x ∶ B → Γ ⊢ lam x ∶ A ⇒ B
   app : ∀ {A B x y} → Γ ⊢ x ∶ A ⇒ B → Γ ⊢ y ∶ A → Γ ⊢ app x y ∶ B
   gen : ∀ {A x} → lift-c Γ ⊢ x ∶ A → Γ ⊢ x ∶ ∀' A
   sub : ∀ {A B x} → Γ ⊢ x ∶ ∀' A → Γ ⊢ x ∶ subst₁ A B
 
 ⊢_∶_ : ∀ {n} → term 0 → type n → Set
-⊢ x ∶ t = [] ⊢ x ∶ t
+⊢ x ∶ t = ε ⊢ x ∶ t
