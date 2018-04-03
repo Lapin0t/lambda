@@ -1,3 +1,7 @@
+-- This is mostly based on the ``Dependently-typed Functional Programming''
+-- lecture from Pierre-Evariste Dagand (17--18, MPRI).
+-- ref: https://gitlab.inria.fr/fpottier/mpri-2.4-public/
+
 module lambda.stlc where
 
 open import Relation.Binary.PropositionalEquality
