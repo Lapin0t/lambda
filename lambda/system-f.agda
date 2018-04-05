@@ -3,7 +3,7 @@ module lambda.system-f where
 open import Data.Nat
 open import Data.Fin hiding (lift)
 open import lambda.vec
-open import lambda.untyped
+open import lambda.untyped hiding (lift; subst; ↑; subst₁)
 
 infixr 22 _⇒_
 infix 20 ∀'_
@@ -24,10 +24,9 @@ lift (var i) = var (suc i)
 lift (∀' x) = ∀' (lift x)
 lift (x ⇒ y) = lift x ⇒ lift y
 
-infixl 30 ↑_
-↑_ : ∀ {n m} → (Fin n → type m) → Fin (suc n) → type (suc m)
-(↑ ρ) zero = var zero
-(↑ ρ) (suc i) = lift (ρ i)
+↑ : ∀ {n m} → (Fin n → type m) → Fin (suc n) → type (suc m)
+↑ ρ zero = var zero
+↑ ρ (suc i) = lift (ρ i)
 
 subst : ∀ {n m} → type n → (Fin n → type m) → type m
 subst (var x) ρ = ρ x
@@ -60,10 +59,10 @@ infix 10 _⊢_∶_
 
 data _⊢_∶_ {n m : ℕ} (Γ : context n m) : term m → type n → Set where
   ax : ∀ {i} → Γ ⊢ var i ∶ lookup i Γ
-  lam : ∀ {A B x} → Γ ▸ A ⊢ x ∶ B → Γ ⊢ lam x ∶ A ⇒ B
+  lam : ∀ {B x} → (A : type n) → Γ ▸ A ⊢ x ∶ B → Γ ⊢ lam x ∶ A ⇒ B
   app : ∀ {A B x y} → Γ ⊢ x ∶ A ⇒ B → Γ ⊢ y ∶ A → Γ ⊢ app x y ∶ B
   gen : ∀ {A x} → lift-c Γ ⊢ x ∶ A → Γ ⊢ x ∶ ∀' A
-  sub : ∀ {A B x} → Γ ⊢ x ∶ ∀' A → Γ ⊢ x ∶ subst₁ A B
+  sub : ∀ {A x} → (B : type n) → Γ ⊢ x ∶ ∀' A → Γ ⊢ x ∶ subst₁ A B
 
 ⊢_∶_ : ∀ {n} → term 0 → type n → Set
 ⊢ x ∶ t = ε ⊢ x ∶ t

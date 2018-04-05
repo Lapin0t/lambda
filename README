@@ -1,0 +1,3 @@
+See `lambda/hw7.agda` for the main file. One can typecheck it by typing
+`agda lambda/hw7.agda` (/!\ relative file path matters). It has been tested
+with Agda 2.5.3
